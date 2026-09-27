@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lettersoxd</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+
+    --bg: #14181C;
+    --bg-raised: #1F252C;
+    --bg-input: #2C3440;
+    --border: #2C3440;
+    --text: #EEF2F5;
+    --text-dim: #9AB;
+    --text-faint: #678;
+    --green: #00E054;
+    --orange: #FF8000;
+    --blue: #40BCF4;
+    --star: #00E054;
+    --danger: #FF6B4A;
+    --poster-edge: rgba(255,255,255,0.14);
+    --overlay: rgba(10, 13, 16, 0.78);
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #F3F5F7;
+      --bg-raised: #FFFFFF;
+      --bg-input: #E6EAEE;
+      --border: #D5DBE1;
+      --text: #14181C;
+      --text-dim: #556270;
+      --text-faint: #8593A0;
+      --green: #00A63E;
+      --orange: #E06F00;
+      --blue: #1D93C7;
+      --star: #00A63E;
+      --danger: #C9381A;
+      --poster-edge: rgba(0,0,0,0.16);
+      --overlay: rgba(20, 24, 28, 0.78);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #F3F5F7;
+    --bg-raised: #FFFFFF;
+    --bg-input: #E6EAEE;
+    --border: #D5DBE1;
+    --text: #14181C;
+    --text-dim: #556270;
+    --text-faint: #8593A0;
+    --green: #00A63E;
+    --orange: #E06F00;
+    --blue: #1D93C7;
+    --star: #00A63E;
+    --danger: #C9381A;
+    --poster-edge: rgba(0,0,0,0.16);
+    --overlay: rgba(20, 24, 28, 0.78);
+  }
+
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-dim);
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, .poster:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+
+  /* Nav */
+  nav.top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 18px 20px;
+    flex-wrap: wrap;
+  }
+  .wordmark {
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: -0.04em;
+    color: var(--text);
+    margin-right: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .wordmark .bars { display: inline-flex; gap: 3px; }
+  .wordmark .bars i { display: block; width: 6px; height: 20px; border-radius: 2px; }
+  .wordmark .bars i:nth-child(1) { background: var(--orange); }
+  .wordmark .bars i:nth-child(2) { background: var(--green); }
+  .wordmark .bars i:nth-child(3) { background: var(--blue); }
+
+  .btn-log {
+    background: var(--green);
+    color: #04140A;
+    border: none;
+    border-radius: 3px;
+    padding: 9px 16px;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .btn-log:hover { filter: brightness(1.1); }
+
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 8px 20px 70px; }
+
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin: 12px 0 16px;
+    flex-wrap: wrap;
+  }
+  .section-head h1 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .section-head .count { color: var(--text-faint); font-weight: 400; margin-left: 8px; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filters input, .filters select {
+    background: var(--bg-input);
+    border: 1px solid transparent;
+    color: var(--text);
+    border-radius: 3px;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .filters input { width: 150px; }
+
+  /* Poster grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+    gap: 12px;
+  }
+  .film { display: flex; flex-direction: column; gap: 5px; }
+  .poster {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    padding: 0;
+    border: 1px solid var(--poster-edge);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--bg-raised);
+    text-align: left;
+  }
+  .poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .poster .no-photo {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px; opacity: 0.4;
+  }
+  .poster::after {
+    content: "";
+    position: absolute; inset: 0;
+    border: 2px solid transparent;
+    border-radius: 3px;
+    transition: border-color 0.12s ease;
+    pointer-events: none;
+  }
+  .poster:hover::after { border-color: var(--green); }
+  .poster .cap {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 22px 8px 8px;
+    background: linear-gradient(to top, var(--overlay), transparent);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.25;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+  }
+  .poster .cap small { display: block; font-weight: 400; opacity: 0.8; margin-top: 2px; }
+  .poster:hover .cap, .poster:focus-visible .cap { opacity: 1; }
+  @media (hover: none) { .poster .cap { opacity: 1; } }
+
+  /* Stars */
+  .stars {
+    position: relative;
+    display: inline-block;
+    font-size: 13px;
+    letter-spacing: 1px;
+    line-height: 1;
+    color: var(--bg-input);
+    user-select: none;
+  }
+  .stars .fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    color: var(--star);
+  }
+  .stars.lg { font-size: 26px; letter-spacing: 3px; cursor: pointer; }
+  .film .stars { min-height: 13px; }
+
+  .empty { text-align: center; padding: 70px 10px; color: var(--text-faint); }
+  .empty h2 { color: var(--text); font-size: 17px; margin: 0 0 6px; }
+
+  footer.stat { margin-top: 40px; font-size: 12px; color: var(--text-faint); text-align: center; }
+
+  /* Modals */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(5, 8, 10, 0.78);
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 16px;
+    z-index: 50;
+  }
+  .overlay.open { display: flex; }
+  .modal {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 100%;
+    max-width: 440px;
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: 22px;
+  }
+  .modal.wide { max-width: 640px; }
+  .modal h2 { margin: 0 0 14px; font-size: 18px; color: var(--text); }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 6px; }
+  .field input[type="text"], .field textarea {
+    width: 100%;
+    background: var(--bg-input);
+    color: var(--text);
+    border: 1px solid transparent;
+    border-radius: 3px;
+    padding: 9px 11px;
+    font-size: 14.5px;
+    font-family: inherit;
+    resize: vertical;
+  }
+  .drop {
+    display: flex; gap: 14px; align-items: center;
+    background: var(--bg-input);
+    border: 1px dashed var(--text-faint);
+    border-radius: 4px;
+    padding: 12px;
+    cursor: pointer;
+  }
+  .drop .thumb {
+    width: 64px; aspect-ratio: 2/3; flex: none;
+    border-radius: 3px; overflow: hidden;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  .drop .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .drop .txt { font-size: 13px; color: var(--text-dim); }
+  .drop .txt b { color: var(--text); display: block; margin-bottom: 2px; font-weight: 600; }
+  .actions { display: flex; gap: 10px; margin-top: 18px; }
+  .btn {
+    flex: 1;
+    border: none;
+    border-radius: 3px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .btn.primary { background: var(--green); color: #04140A; }
+  .btn.primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn.ghost { background: var(--bg-input); color: var(--text-dim); }
+  .btn.danger { background: var(--danger); color: #fff; }
+
+  .detail { display: grid; grid-template-columns: 190px 1fr; gap: 22px; }
+  .detail .big-poster {
+    width: 100%; aspect-ratio: 2/3;
+    border: 1px solid var(--poster-edge);
+    border-radius: 4px; overflow: hidden;
+    background: var(--bg);
+  }
+  .detail .big-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .detail h2 { font-size: 24px; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .brand-tag {
+    display: inline-block;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 9px;
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+  .rate-label { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); margin: 10px 0 4px; }
+  .notes { color: var(--text-dim); margin: 14px 0 0; white-space: pre-wrap; }
+  .added { color: var(--text-faint); font-size: 12.5px; margin-top: 12px; }
+  .del-zone { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .link-danger { background: none; border: none; color: var(--danger); font-size: 13px; font-weight: 600; padding: 0; }
+  .hidden { display: none !important; }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    background: var(--text);
+    color: var(--bg);
+    padding: 9px 16px;
+    border-radius: 3px;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 60;
+  }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 520px) {
+    .detail { grid-template-columns: 1fr; }
+    .detail .big-poster { max-width: 200px; }
+    .filters input { width: 120px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="wordmark"><span class="bars"><i></i><i></i><i></i></span>lettersoxd</div>
+  <button class="btn-log" id="openAddBtn">+ Log a pair</button>
+</nav>
+
+<main class="wrap">
+  <div class="section-head">
+    <h1>Socks<span class="count" id="countLine"></span></h1>
+    <div class="filters">
+      <input type="text" id="searchInput" placeholder="Search name" aria-label="Search by name">
+      <select id="brandFilter" aria-label="Filter by brand"><option value="">All brands</option></select>
+      <select id="sortSelect" aria-label="Sort">
+        <option value="recent">Recently added</option>
+        <option value="rating">Highest rated</option>
+        <option value="name">Name A–Z</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="gridArea"></div>
+  <footer class="stat" id="statLine"></footer>
+</main>
+
+<!-- Add modal -->
+<div class="overlay" id="addOverlay">
+  <div class="modal">
+    <h2>Log a pair</h2>
+
+    <div class="field">
+      <label>Photo</label>
+      <div class="drop" id="photoTrigger">
+        <div class="thumb" id="thumbSlot">🧦</div>
+        <div class="txt" id="photoHint"><b>Take or choose a photo</b>It's shrunk automatically before saving.</div>
+      </div>
+      <input type="file" accept="image/*" id="photoInput" class="hidden">
+      <div style="margin-top:8px;">
+        <button type="button" class="link-danger" id="cameraBtn" style="color:var(--blue)">Use camera</button>
+        <input type="file" accept="image/*" capture="environment" id="cameraInput" class="hidden">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="nameInput">Name</label>
+      <input type="text" id="nameInput" placeholder="e.g. Space Jam Argyle">
+    </div>
+    <div class="field">
+      <label for="brandInput">Brand / tag</label>
+      <input type="text" id="brandInput" list="brandSuggestions" placeholder="e.g. Disney, Coke">
+      <datalist id="brandSuggestions"></datalist>
+    </div>
+    <div class="field">
+      <label>Rating</label>
+      <div id="addRatingSlot"></div>
+    </div>
+    <div class="field">
+      <label for="notesInput">Notes</label>
+      <textarea id="notesInput" rows="2" placeholder="Where you got them, how they wear…"></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn ghost" id="cancelAddBtn">Cancel</button>
+      <button class="btn primary" id="saveBtn" disabled>Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail modal -->
+<div class="overlay" id="detailOverlay">
+  <div class="modal wide" id="detailBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- IndexedDB ----------
+  const DB_NAME = "sockDrawerDB"; // same DB as before so existing pairs carry over
+  const STORE = "socks";
+  let dbPromise = null;
+
+  function openDB() {
+    if (dbPromise) return dbPromise;
+    dbPromise = new Promise((resolve, reject) => {
+      try {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: "id" });
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      } catch (e) { reject(e); }
+    });
+    return dbPromise;
+  }
+  async function dbGetAll() {
+    try {
+      const db = await openDB();
+      return await new Promise((resolve, reject) => {
+        const req = db.transaction(STORE, "readonly").objectStore(STORE).getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => reject(req.error);
+      });
+    } catch (e) { console.error(e); return []; }
+  }
+  async function dbPut(rec) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, "readwrite");
+      tx.objectStore(STORE).put(rec);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+  async function dbDelete(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, "readwrite");
+      tx.objectStore(STORE).delete(id);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  // ---------- Image compression ----------
+  const FULL_MAX = 800;      // longest side of detail image
+  const THUMB_W = 300;       // poster thumbnail, 2:3
+  const THUMB_H = 450;
+  const supportsWebp = (() => {
+    try { return document.createElement("canvas").toDataURL("image/webp").startsWith("data:image/webp"); }
+    catch (e) { return false; }
+  })();
+
+  function encode(canvas, q) {
+    return supportsWebp ? canvas.toDataURL("image/webp", q) : canvas.toDataURL("image/jpeg", q);
+  }
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+  function makeFull(img) {
+    let w = img.naturalWidth, h = img.naturalHeight;
+    const scale = Math.min(1, FULL_MAX / Math.max(w, h));
+    w = Math.round(w * scale); h = Math.round(h * scale);
+    const c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    c.getContext("2d").drawImage(img, 0, 0, w, h);
+    return encode(c, 0.72);
+  }
+  function makeThumb(img) {
+    // Center-crop to a 2:3 poster
+    const c = document.createElement("canvas");
+    c.width = THUMB_W; c.height = THUMB_H;
+    const targetRatio = THUMB_W / THUMB_H;
+    const srcRatio = img.naturalWidth / img.naturalHeight;
+    let sx = 0, sy = 0, sw = img.naturalWidth, sh = img.naturalHeight;
+    if (srcRatio > targetRatio) { sw = sh * targetRatio; sx = (img.naturalWidth - sw) / 2; }
+    else { sh = sw / targetRatio; sy = (img.naturalHeight - sh) / 2; }
+    c.getContext("2d").drawImage(img, sx, sy, sw, sh, 0, 0, THUMB_W, THUMB_H);
+    return encode(c, 0.7);
+  }
+  function approxBytes(dataUrl) { return dataUrl ? Math.round(dataUrl.length * 0.75) : 0; }
+  function fmtBytes(n) {
+    if (n < 1024) return n + " B";
+    if (n < 1024 * 1024) return Math.round(n / 1024) + " KB";
+    return (n / 1024 / 1024).toFixed(1) + " MB";
+  }
+
+  // ---------- State & helpers ----------
+  let allSocks = [];
+  let pending = { photo: null, thumb: null, rating: 0 };
+
+  const $ = (id) => document.getElementById(id);
+  const gridArea = $("gridArea"), countLine = $("countLine"), statLine = $("statLine");
+  const searchInput = $("searchInput"), brandFilter = $("brandFilter"), sortSelect = $("sortSelect");
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+  function toast(msg) {
+    const t = $("toast");
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 1800);
+  }
+  function fmtDate(ts) {
+    try { return new Date(ts).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }); }
+    catch (e) { return ""; }
+  }
+
+  // ---------- Stars (half-star capable, rating stored as 0-10) ----------
+  function starsHtml(value, large) {
+    const pct = Math.max(0, Math.min(10, value || 0)) * 10;
+    return `<span class="stars${large ? " lg" : ""}" aria-label="${(value || 0) / 2} out of 5 stars">★★★★★<span class="fill" style="width:${pct}%">★★★★★</span></span>`;
+  }
+  function mountRatingInput(slot, initial, onChange) {
+    let value = initial || 0;
+    slot.innerHTML = starsHtml(value, true);
+    const el = slot.querySelector(".stars");
+    el.addEventListener("click", (e) => {
+      const rect = el.getBoundingClientRect();
+      const frac = (e.clientX - rect.left) / rect.width;
+      let v = Math.max(1, Math.min(10, Math.ceil(frac * 10)));
+      if (v === value) v = 0;   // tap the same rating again to clear
+      value = v;
+      el.querySelector(".fill").style.width = (value * 10) + "%";
+      onChange(value);
+    });
+  }
+
+  // ---------- Load / render ----------
+  async function loadAll() {
+    allSocks = await dbGetAll();
+    refreshBrands();
+    render();
+    migrateOldPhotos();
+  }
+
+  // Older entries saved before thumbnails existed get one generated once
+  async function migrateOldPhotos() {
+    let changed = false;
+    for (const s of allSocks) {
+      if (s.photo && !s.thumb) {
+        try {
+          const img = await loadImage(s.photo);
+          s.thumb = makeThumb(img);
+          s.photo = makeFull(img);
+          await dbPut(s);
+          changed = true;
+        } catch (e) { console.error("migrate failed", e); }
+      }
+    }
+    if (changed) render();
+  }
+
+  function refreshBrands() {
+    const brands = Array.from(new Set(allSocks.map(s => s.brand).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+    const cur = brandFilter.value;
+    brandFilter.innerHTML = '<option value="">All brands</option>' + brands.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join("");
+    if (brands.includes(cur)) brandFilter.value = cur;
+    $("brandSuggestions").innerHTML = brands.map(b => `<option value="${esc(b)}">`).join("");
+  }
+
+  function render() {
+    const q = searchInput.value.trim().toLowerCase();
+    const brand = brandFilter.value;
+    let list = allSocks.filter(s => (!q || s.name.toLowerCase().includes(q)) && (!brand || s.brand === brand));
+
+    const sort = sortSelect.value;
+    if (sort === "rating") list.sort((a, b) => (b.rating || 0) - (a.rating || 0) || b.createdAt - a.createdAt);
+    else if (sort === "name") list.sort((a, b) => a.name.localeCompare(b.name));
+    else list.sort((a, b) => b.createdAt - a.createdAt);   // default: recently added
+
+    countLine.textContent = allSocks.length ? `${allSocks.length} pair${allSocks.length === 1 ? "" : "s"}` : "";
+
+    const bytes = allSocks.reduce((n, s) => n + approxBytes(s.photo) + approxBytes(s.thumb), 0);
+    statLine.textContent = allSocks.length ? `Photos take up about ${fmtBytes(bytes)} in total` : "";
+
+    if (!allSocks.length) {
+      gridArea.innerHTML = `<div class="empty"><h2>Nothing logged yet</h2>Log your first pair to start the collection.</div>`;
+      return;
+    }
+    if (!list.length) {
+      gridArea.innerHTML = `<div class="empty"><h2>No matches</h2>Try a different search or brand.</div>`;
+      return;
+    }
+
+    gridArea.innerHTML = `<div class="grid">` + list.map(s => {
+      const src = s.thumb || s.photo;
+      return `<div class="film">
+        <button class="poster" data-id="${esc(s.id)}" aria-label="Open ${esc(s.name)}">
+          ${src ? `<img src="${src}" alt="${esc(s.name)}" loading="lazy">` : `<div class="no-photo">🧦</div>`}
+          <span class="cap">${esc(s.name)}${s.brand ? `<small>${esc(s.brand)}</small>` : ""}</span>
+        </button>
+        ${s.rating ? starsHtml(s.rating, false) : ""}
+      </div>`;
+    }).join("") + `</div>`;
+
+    gridArea.querySelectorAll(".poster").forEach(b => b.addEventListener("click", () => openDetail(b.getAttribute("data-id"))));
+  }
+
+  searchInput.addEventListener("input", render);
+  brandFilter.addEventListener("change", render);
+  sortSelect.addEventListener("change", render);
+
+  // ---------- Detail ----------
+  const detailOverlay = $("detailOverlay"), detailBody = $("detailBody");
+
+  function openDetail(id) {
+    const s = allSocks.find(x => x.id === id);
+    if (!s) return;
+    const src = s.photo || s.thumb;
+    detailBody.innerHTML = `
+      <div class="detail">
+        <div class="big-poster">${src ? `<img src="${src}" alt="${esc(s.name)}">` : ""}</div>
+        <div>
+          <h2>${esc(s.name)}</h2>
+          ${s.brand ? `<span class="brand-tag">${esc(s.brand)}</span>` : ""}
+          <div class="rate-label">Your rating</div>
+          <div id="detailRating"></div>
+          ${s.notes ? `<p class="notes">${esc(s.notes)}</p>` : ""}
+          <div class="added">Logged ${fmtDate(s.createdAt)}</div>
+          <div class="del-zone" id="delZone">
+            <button class="btn ghost" id="closeDetail" style="flex:0 1 auto">Close</button>
+            <button class="link-danger" id="askDelete">Delete this pair</button>
+          </div>
+          <div class="del-zone hidden" id="confirmZone">
+            <span style="flex:1">Delete for good?</span>
+            <button class="btn ghost" id="cancelDelete" style="flex:0 1 auto">No</button>
+            <button class="btn danger" id="confirmDelete" style="flex:0 1 auto">Delete</button>
+          </div>
+        </div>
+      </div>`;
+    detailOverlay.classList.add("open");
+
+    mountRatingInput($("detailRating"), s.rating || 0, async (v) => {
+      s.rating = v;
+      try { await dbPut(s); render(); } catch (e) { console.error(e); toast("Couldn't save rating"); }
+    });
+    $("closeDetail").onclick = closeDetail;
+    $("askDelete").onclick = () => { $("delZone").classList.add("hidden"); $("confirmZone").classList.remove("hidden"); };
+    $("cancelDelete").onclick = () => { $("confirmZone").classList.add("hidden"); $("delZone").classList.remove("hidden"); };
+    $("confirmDelete").onclick = async () => {
+      try {
+        await dbDelete(id);
+        toast("Pair deleted");
+        closeDetail();
+        await loadAll();
+      } catch (e) { console.error(e); toast("Couldn't delete — try again"); }
+    };
+  }
+  function closeDetail() { detailOverlay.classList.remove("open"); detailBody.innerHTML = ""; }
+  detailOverlay.addEventListener("click", e => { if (e.target === detailOverlay) closeDetail(); });
+
+  // ---------- Add ----------
+  const addOverlay = $("addOverlay"), nameInput = $("nameInput"), brandInput = $("brandInput"),
+        notesInput = $("notesInput"), saveBtn = $("saveBtn"), photoInput = $("photoInput"), cameraInput = $("cameraInput");
+
+  function resetAdd() {
+    pending = { photo: null, thumb: null, rating: 0 };
+    nameInput.value = ""; brandInput.value = ""; notesInput.value = "";
+    $("thumbSlot").innerHTML = "🧦";
+    $("photoHint").innerHTML = "<b>Take or choose a photo</b>It's shrunk automatically before saving.";
+    mountRatingInput($("addRatingSlot"), 0, v => { pending.rating = v; });
+    saveBtn.disabled = true;
+  }
+
+  $("openAddBtn").addEventListener("click", () => {
+    resetAdd();
+    addOverlay.classList.add("open");
+    setTimeout(() => nameInput.focus(), 50);
+  });
+  $("cancelAddBtn").addEventListener("click", () => addOverlay.classList.remove("open"));
+  addOverlay.addEventListener("click", e => { if (e.target === addOverlay) addOverlay.classList.remove("open"); });
+  $("photoTrigger").addEventListener("click", () => photoInput.click());
+  $("cameraBtn").addEventListener("click", () => cameraInput.click());
+  nameInput.addEventListener("input", () => { saveBtn.disabled = !nameInput.value.trim(); });
+
+  async function handleFile(file) {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await loadImage(url);
+      pending.photo = makeFull(img);
+      pending.thumb = makeThumb(img);
+      const after = approxBytes(pending.photo) + approxBytes(pending.thumb);
+      $("thumbSlot").innerHTML = `<img src="${pending.thumb}" alt="Preview">`;
+      $("photoHint").innerHTML = `<b>Photo ready</b>${fmtBytes(file.size)} → ${fmtBytes(after)} after compression`;
+    } catch (e) {
+      console.error(e);
+      toast("Couldn't read that photo");
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+  photoInput.addEventListener("change", () => handleFile(photoInput.files[0]));
+  cameraInput.addEventListener("change", () => handleFile(cameraInput.files[0]));
+
+  saveBtn.addEventListener("click", async () => {
+    const name = nameInput.value.trim();
+    if (!name) return;
+    const rec = {
+      id: "s_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8),
+      name,
+      brand: brandInput.value.trim(),
+      notes: notesInput.value.trim(),
+      rating: pending.rating || 0,
+      photo: pending.photo,
+      thumb: pending.thumb,
+      createdAt: Date.now()
+    };
+    saveBtn.disabled = true;
+    try {
+      await dbPut(rec);
+      addOverlay.classList.remove("open");
+      toast("Pair logged");
+      await loadAll();
+    } catch (e) {
+      console.error(e);
+      toast("Couldn't save — try again");
+      saveBtn.disabled = false;
+    }
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") { addOverlay.classList.remove("open"); closeDetail(); }
+  });
+
+  loadAll();
+})();
+</script>
+</body>
+</html>
