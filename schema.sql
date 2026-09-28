@@ -22,6 +22,11 @@ create index if not exists socks_user_created_idx on public.socks (user_id, crea
 -- ============================================================
 -- 2. Row-level security: each person can only touch their own rows
 -- ============================================================
+-- Newer Supabase projects don't automatically give the API roles access to
+-- new tables, so grant it explicitly. Signed-in users only; anonymous visitors get nothing.
+-- (The row-level policies below still limit each user to their own rows.)
+grant select, insert, update, delete on public.socks to authenticated;
+
 alter table public.socks enable row level security;
 
 drop policy if exists "socks: select own" on public.socks;
