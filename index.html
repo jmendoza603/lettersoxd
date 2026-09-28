@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lettersoxd</title>
+  <link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
@@ -66,25 +67,24 @@
   .hidden { display: none !important; }
 
   /* Wordmark */
-  .wordmark {
-    font-weight: 800; font-size: 24px; letter-spacing: -0.04em; color: var(--text);
-    display: flex; align-items: center; gap: 10px;
+  .logo { 
+    height: 32px; 
+    width: auto; 
+    display: block; 
   }
-  .wordmark .bars { display: inline-flex; gap: 3px; }
-  .wordmark .bars i { display: block; width: 6px; height: 20px; border-radius: 2px; }
-  .wordmark .bars i:nth-child(1) { background: var(--orange); }
-  .wordmark .bars i:nth-child(2) { background: var(--green); }
-  .wordmark .bars i:nth-child(3) { background: var(--blue); }
+  nav.top .logo { 
+    margin-right: auto; 
+  }   /* keeps the buttons pushed to the right */
+  .auth-card .logo { 
+    height: 40px; 
+    margin-bottom: 
+      10px; 
+  }
 
   /* Nav */
   nav.top {
     display: flex; align-items: center; gap: 10px;
     max-width: 1000px; margin: 0 auto; padding: 18px 20px; flex-wrap: wrap;
-  }
-  nav.top .wordmark { margin-right: auto; }
-  .btn-log {
-    background: var(--green); color: #04140A; border: none; border-radius: 3px;
-    padding: 9px 16px; font-weight: 600; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;
   }
   .btn-log:hover { filter: brightness(1.1); }
   .btn-account {
@@ -147,7 +147,6 @@
     width: 100%; max-width: 380px; background: var(--bg-raised);
     border: 1px solid var(--border); border-radius: 6px; padding: 26px;
   }
-  .auth-card .wordmark { margin-bottom: 4px; }
   .auth-card .tagline { margin: 0 0 20px; color: var(--text-faint); font-size: 14px; }
   .auth-card h2 { margin: 0 0 14px; font-size: 18px; color: var(--text); }
   .tabs { display: flex; gap: 4px; margin-bottom: 18px; background: var(--bg-input); padding: 3px; border-radius: 4px; }
@@ -238,12 +237,12 @@
 <body>
 
 <!-- Loading -->
-<section id="loadingView" class="center-view"><div class="wordmark"><span class="bars"><i></i><i></i><i></i></span>lettersoxd</div></section>
+<section id="loadingView" class="center-view"><img src="logo.png" alt="Lettersoxd" class="logo"></section>
 
 <!-- Setup notice (shown until the two config values below are filled in) -->
 <section id="setupView" class="center-view hidden">
   <div class="auth-card">
-    <div class="wordmark"><span class="bars"><i></i><i></i><i></i></span>lettersoxd</div>
+    <img src="logo.png" alt="Lettersoxd" class="logo">
     <p class="tagline">Almost there — connect your Supabase project.</p>
     <div class="setup-steps">
       Open <code>index.html</code> and replace <code>SUPABASE_URL</code> and <code>SUPABASE_KEY</code> near the top of the script with the values from your Supabase project. The README has the full walkthrough.
@@ -254,7 +253,7 @@
 <!-- Sign in / create account -->
 <section id="authView" class="center-view hidden">
   <div class="auth-card">
-    <div class="wordmark"><span class="bars"><i></i><i></i><i></i></span>lettersoxd</div>
+    <img src="logo.png" alt="Lettersoxd" class="logo">
     <p class="tagline">Log every pair in your sock drawer.</p>
     <div class="tabs" role="tablist">
       <button class="tab active" data-mode="signin" role="tab">Sign in</button>
@@ -294,7 +293,7 @@
 <!-- Main app -->
 <div id="appView" class="hidden">
   <nav class="top">
-    <div class="wordmark"><span class="bars"><i></i><i></i><i></i></span>lettersoxd</div>
+    <img src="logo.png" alt="Lettersoxd" class="logo">
     <button class="btn-log" id="openAddBtn">+ Log a pair</button>
     <button class="btn-account" id="openAccountBtn" aria-label="Account">Account</button>
   </nav>
