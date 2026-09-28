@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     box-sizing: border-box;
@@ -25,43 +26,25 @@
     --blue: #40BCF4;
     --star: #00E054;
     --danger: #FF6B4A;
+    --ok: #00E054;
     --poster-edge: rgba(255,255,255,0.14);
     --overlay: rgba(10, 13, 16, 0.78);
   }
-
   @media (prefers-color-scheme: light) {
     :root:not([data-theme="dark"]) {
-      --bg: #F3F5F7;
-      --bg-raised: #FFFFFF;
-      --bg-input: #E6EAEE;
-      --border: #D5DBE1;
-      --text: #14181C;
-      --text-dim: #556270;
-      --text-faint: #8593A0;
-      --green: #00A63E;
-      --orange: #E06F00;
-      --blue: #1D93C7;
-      --star: #00A63E;
-      --danger: #C9381A;
-      --poster-edge: rgba(0,0,0,0.16);
-      --overlay: rgba(20, 24, 28, 0.78);
+      --bg: #F3F5F7; --bg-raised: #FFFFFF; --bg-input: #E6EAEE; --border: #D5DBE1;
+      --text: #14181C; --text-dim: #556270; --text-faint: #8593A0;
+      --green: #00A63E; --orange: #E06F00; --blue: #1D93C7; --star: #00A63E;
+      --danger: #C9381A; --ok: #00873A;
+      --poster-edge: rgba(0,0,0,0.16); --overlay: rgba(20, 24, 28, 0.78);
     }
   }
   :root[data-theme="light"] {
-    --bg: #F3F5F7;
-    --bg-raised: #FFFFFF;
-    --bg-input: #E6EAEE;
-    --border: #D5DBE1;
-    --text: #14181C;
-    --text-dim: #556270;
-    --text-faint: #8593A0;
-    --green: #00A63E;
-    --orange: #E06F00;
-    --blue: #1D93C7;
-    --star: #00A63E;
-    --danger: #C9381A;
-    --poster-edge: rgba(0,0,0,0.16);
-    --overlay: rgba(20, 24, 28, 0.78);
+    --bg: #F3F5F7; --bg-raised: #FFFFFF; --bg-input: #E6EAEE; --border: #D5DBE1;
+    --text: #14181C; --text-dim: #556270; --text-faint: #8593A0;
+    --green: #00A63E; --orange: #E06F00; --blue: #1D93C7; --star: #00A63E;
+    --danger: #C9381A; --ok: #00873A;
+    --poster-edge: rgba(0,0,0,0.16); --overlay: rgba(20, 24, 28, 0.78);
   }
 
   html { scroll-padding-top: env(safe-area-inset-top, 0px); }
@@ -76,30 +59,16 @@
     -webkit-font-smoothing: antialiased;
   }
   button { font-family: inherit; cursor: pointer; }
-  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, .poster:focus-visible {
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, .poster:focus-visible, .tab:focus-visible {
     outline: 2px solid var(--green);
     outline-offset: 2px;
   }
+  .hidden { display: none !important; }
 
-  /* Nav */
-  nav.top {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 18px 20px;
-    flex-wrap: wrap;
-  }
+  /* Wordmark */
   .wordmark {
-    font-weight: 800;
-    font-size: 24px;
-    letter-spacing: -0.04em;
-    color: var(--text);
-    margin-right: auto;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    font-weight: 800; font-size: 24px; letter-spacing: -0.04em; color: var(--text);
+    display: flex; align-items: center; gap: 10px;
   }
   .wordmark .bars { display: inline-flex; gap: 3px; }
   .wordmark .bars i { display: block; width: 6px; height: 20px; border-radius: 2px; }
@@ -107,234 +76,155 @@
   .wordmark .bars i:nth-child(2) { background: var(--green); }
   .wordmark .bars i:nth-child(3) { background: var(--blue); }
 
+  /* Nav */
+  nav.top {
+    display: flex; align-items: center; gap: 10px;
+    max-width: 1000px; margin: 0 auto; padding: 18px 20px; flex-wrap: wrap;
+  }
+  nav.top .wordmark { margin-right: auto; }
   .btn-log {
-    background: var(--green);
-    color: #04140A;
-    border: none;
-    border-radius: 3px;
-    padding: 9px 16px;
-    font-weight: 600;
-    font-size: 13px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    background: var(--green); color: #04140A; border: none; border-radius: 3px;
+    padding: 9px 16px; font-weight: 600; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;
   }
   .btn-log:hover { filter: brightness(1.1); }
+  .btn-account {
+    background: var(--bg-input); color: var(--text-dim); border: none; border-radius: 3px;
+    padding: 9px 12px; font-size: 13px; font-weight: 500;
+  }
 
   .wrap { max-width: 1000px; margin: 0 auto; padding: 8px 20px 70px; }
 
   .section-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 8px;
-    margin: 12px 0 16px;
-    flex-wrap: wrap;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    border-bottom: 1px solid var(--border); padding-bottom: 8px; margin: 12px 0 16px; flex-wrap: wrap;
   }
   .section-head h1 {
-    margin: 0;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
+    margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim);
   }
   .section-head .count { color: var(--text-faint); font-weight: 400; margin-left: 8px; }
   .filters { display: flex; gap: 8px; flex-wrap: wrap; }
   .filters input, .filters select {
-    background: var(--bg-input);
-    border: 1px solid transparent;
-    color: var(--text);
-    border-radius: 3px;
-    padding: 6px 10px;
-    font-size: 13px;
-    font-family: inherit;
+    background: var(--bg-input); border: 1px solid transparent; color: var(--text);
+    border-radius: 3px; padding: 6px 10px; font-size: 13px; font-family: inherit;
   }
   .filters input { width: 150px; }
 
-  /* Poster grid */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
-    gap: 12px;
-  }
+  /* Grid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 12px; }
   .film { display: flex; flex-direction: column; gap: 5px; }
   .poster {
-    position: relative;
-    display: block;
-    width: 100%;
-    aspect-ratio: 2 / 3;
-    padding: 0;
-    border: 1px solid var(--poster-edge);
-    border-radius: 4px;
-    overflow: hidden;
-    background: var(--bg-raised);
-    text-align: left;
+    position: relative; display: block; width: 100%; aspect-ratio: 2 / 3; padding: 0;
+    border: 1px solid var(--poster-edge); border-radius: 4px; overflow: hidden;
+    background: var(--bg-raised); text-align: left;
   }
   .poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .poster .no-photo {
-    width: 100%; height: 100%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 34px; opacity: 0.4;
-  }
+  .poster .no-photo { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 34px; opacity: 0.4; }
   .poster::after {
-    content: "";
-    position: absolute; inset: 0;
-    border: 2px solid transparent;
-    border-radius: 3px;
-    transition: border-color 0.12s ease;
-    pointer-events: none;
+    content: ""; position: absolute; inset: 0; border: 2px solid transparent; border-radius: 3px;
+    transition: border-color 0.12s ease; pointer-events: none;
   }
   .poster:hover::after { border-color: var(--green); }
   .poster .cap {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    padding: 22px 8px 8px;
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 8px 8px;
     background: linear-gradient(to top, var(--overlay), transparent);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.25;
-    opacity: 0;
-    transition: opacity 0.12s ease;
+    color: #fff; font-size: 12px; font-weight: 600; line-height: 1.25;
+    opacity: 0; transition: opacity 0.12s ease;
   }
   .poster .cap small { display: block; font-weight: 400; opacity: 0.8; margin-top: 2px; }
   .poster:hover .cap, .poster:focus-visible .cap { opacity: 1; }
   @media (hover: none) { .poster .cap { opacity: 1; } }
 
-  /* Stars */
-  .stars {
-    position: relative;
-    display: inline-block;
-    font-size: 13px;
-    letter-spacing: 1px;
-    line-height: 1;
-    color: var(--bg-input);
-    user-select: none;
-  }
-  .stars .fill {
-    position: absolute; left: 0; top: 0; bottom: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    color: var(--star);
-  }
+  .stars { position: relative; display: inline-block; font-size: 13px; letter-spacing: 1px; line-height: 1; color: var(--bg-input); user-select: none; }
+  .stars .fill { position: absolute; left: 0; top: 0; bottom: 0; overflow: hidden; white-space: nowrap; color: var(--star); }
   .stars.lg { font-size: 26px; letter-spacing: 3px; cursor: pointer; }
-  .film .stars { min-height: 13px; }
 
   .empty { text-align: center; padding: 70px 10px; color: var(--text-faint); }
   .empty h2 { color: var(--text); font-size: 17px; margin: 0 0 6px; }
 
-  footer.stat { margin-top: 40px; font-size: 12px; color: var(--text-faint); text-align: center; }
+  /* Full-page views: loading, setup, auth, recovery */
+  .center-view { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .auth-card {
+    width: 100%; max-width: 380px; background: var(--bg-raised);
+    border: 1px solid var(--border); border-radius: 6px; padding: 26px;
+  }
+  .auth-card .wordmark { margin-bottom: 4px; }
+  .auth-card .tagline { margin: 0 0 20px; color: var(--text-faint); font-size: 14px; }
+  .auth-card h2 { margin: 0 0 14px; font-size: 18px; color: var(--text); }
+  .tabs { display: flex; gap: 4px; margin-bottom: 18px; background: var(--bg-input); padding: 3px; border-radius: 4px; }
+  .tab {
+    flex: 1; background: transparent; border: none; color: var(--text-dim);
+    padding: 8px; border-radius: 3px; font-size: 13px; font-weight: 600;
+  }
+  .tab.active { background: var(--bg-raised); color: var(--text); }
+  .msg { font-size: 13px; margin-top: 12px; min-height: 18px; }
+  .msg.err { color: var(--danger); }
+  .msg.ok { color: var(--ok); }
+  .linkish { background: none; border: none; padding: 0; color: var(--blue); font-size: 13px; }
+  .setup-steps { text-align: left; color: var(--text-dim); font-size: 14px; }
+  .setup-steps code { background: var(--bg-input); padding: 1px 6px; border-radius: 3px; color: var(--text); font-size: 13px; }
+
+  /* Forms and buttons */
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 6px; }
+  .field input[type="text"], .field input[type="email"], .field input[type="password"], .field textarea {
+    width: 100%; background: var(--bg-input); color: var(--text);
+    border: 1px solid transparent; border-radius: 3px; padding: 9px 11px;
+    font-size: 15px; font-family: inherit; resize: vertical;
+  }
+  .btn {
+    flex: 1; border: none; border-radius: 3px; padding: 10px 12px;
+    font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .btn.primary { background: var(--green); color: #04140A; }
+  .btn.primary:disabled, .btn.danger:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn.ghost { background: var(--bg-input); color: var(--text-dim); }
+  .btn.danger { background: var(--danger); color: #fff; }
+  .btn.block { width: 100%; }
+  .actions { display: flex; gap: 10px; margin-top: 18px; }
 
   /* Modals */
   .overlay {
-    position: fixed; inset: 0;
-    background: rgba(5, 8, 10, 0.78);
-    display: none;
-    align-items: center; justify-content: center;
-    padding: 16px;
-    z-index: 50;
+    position: fixed; inset: 0; background: rgba(5, 8, 10, 0.78);
+    display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50;
   }
   .overlay.open { display: flex; }
   .modal {
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    width: 100%;
-    max-width: 440px;
-    max-height: 92vh;
-    overflow-y: auto;
-    padding: 22px;
+    background: var(--bg-raised); border: 1px solid var(--border); border-radius: 6px;
+    width: 100%; max-width: 440px; max-height: 92vh; overflow-y: auto; padding: 22px;
   }
   .modal.wide { max-width: 640px; }
   .modal h2 { margin: 0 0 14px; font-size: 18px; color: var(--text); }
-  .field { margin-bottom: 14px; }
-  .field label { display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 6px; }
-  .field input[type="text"], .field textarea {
-    width: 100%;
-    background: var(--bg-input);
-    color: var(--text);
-    border: 1px solid transparent;
-    border-radius: 3px;
-    padding: 9px 11px;
-    font-size: 14.5px;
-    font-family: inherit;
-    resize: vertical;
-  }
   .drop {
-    display: flex; gap: 14px; align-items: center;
-    background: var(--bg-input);
-    border: 1px dashed var(--text-faint);
-    border-radius: 4px;
-    padding: 12px;
-    cursor: pointer;
+    display: flex; gap: 14px; align-items: center; background: var(--bg-input);
+    border: 1px dashed var(--text-faint); border-radius: 4px; padding: 12px; cursor: pointer;
   }
   .drop .thumb {
-    width: 64px; aspect-ratio: 2/3; flex: none;
-    border-radius: 3px; overflow: hidden;
-    background: var(--bg);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px;
+    width: 64px; aspect-ratio: 2/3; flex: none; border-radius: 3px; overflow: hidden;
+    background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 24px;
   }
   .drop .thumb img { width: 100%; height: 100%; object-fit: cover; }
   .drop .txt { font-size: 13px; color: var(--text-dim); }
   .drop .txt b { color: var(--text); display: block; margin-bottom: 2px; font-weight: 600; }
-  .actions { display: flex; gap: 10px; margin-top: 18px; }
-  .btn {
-    flex: 1;
-    border: none;
-    border-radius: 3px;
-    padding: 10px 12px;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .btn.primary { background: var(--green); color: #04140A; }
-  .btn.primary:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn.ghost { background: var(--bg-input); color: var(--text-dim); }
-  .btn.danger { background: var(--danger); color: #fff; }
 
   .detail { display: grid; grid-template-columns: 190px 1fr; gap: 22px; }
-  .detail .big-poster {
-    width: 100%; aspect-ratio: 2/3;
-    border: 1px solid var(--poster-edge);
-    border-radius: 4px; overflow: hidden;
-    background: var(--bg);
-  }
+  .detail .big-poster { width: 100%; aspect-ratio: 2/3; border: 1px solid var(--poster-edge); border-radius: 4px; overflow: hidden; background: var(--bg); }
   .detail .big-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .detail h2 { font-size: 24px; letter-spacing: -0.02em; margin-bottom: 4px; }
-  .brand-tag {
-    display: inline-block;
-    color: var(--text-dim);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 2px 9px;
-    font-size: 12px;
-    margin-bottom: 12px;
-  }
+  .brand-tag { display: inline-block; color: var(--text-dim); border: 1px solid var(--border); border-radius: 3px; padding: 2px 9px; font-size: 12px; margin-bottom: 12px; }
   .rate-label { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); margin: 10px 0 4px; }
   .notes { color: var(--text-dim); margin: 14px 0 0; white-space: pre-wrap; }
   .added { color: var(--text-faint); font-size: 12.5px; margin-top: 12px; }
   .del-zone { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .link-danger { background: none; border: none; color: var(--danger); font-size: 13px; font-weight: 600; padding: 0; }
-  .hidden { display: none !important; }
+
+  .danger-zone { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .danger-zone p { font-size: 13px; margin: 0 0 10px; }
 
   .toast {
-    position: fixed;
-    left: 50%;
-    bottom: calc(22px + env(safe-area-inset-bottom, 0px));
-    transform: translateX(-50%);
-    background: var(--text);
-    color: var(--bg);
-    padding: 9px 16px;
-    border-radius: 3px;
-    font-size: 13px;
-    font-weight: 500;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.2s ease;
-    z-index: 60;
+    position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%); background: var(--text); color: var(--bg);
+    padding: 9px 16px; border-radius: 3px; font-size: 13px; font-weight: 500;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 60;
   }
   .toast.show { opacity: 1; }
 
@@ -347,54 +237,108 @@
 </head>
 <body>
 
-<nav class="top">
-  <div class="wordmark"><span class="bars"><i></i><i></i><i></i></span>lettersoxd</div>
-  <button class="btn-log" id="openAddBtn">+ Log a pair</button>
-</nav>
+<!-- Loading -->
+<section id="loadingView" class="center-view"><div class="wordmark"><span class="bars"><i></i><i></i><i></i></span>lettersoxd</div></section>
 
-<main class="wrap">
-  <div class="section-head">
-    <h1>Socks<span class="count" id="countLine"></span></h1>
-    <div class="filters">
-      <input type="text" id="searchInput" placeholder="Search name" aria-label="Search by name">
-      <select id="brandFilter" aria-label="Filter by brand"><option value="">All brands</option></select>
-      <select id="sortSelect" aria-label="Sort">
-        <option value="recent">Recently added</option>
-        <option value="rating">Highest rated</option>
-        <option value="name">Name A–Z</option>
-      </select>
+<!-- Setup notice (shown until the two config values below are filled in) -->
+<section id="setupView" class="center-view hidden">
+  <div class="auth-card">
+    <div class="wordmark"><span class="bars"><i></i><i></i><i></i></span>lettersoxd</div>
+    <p class="tagline">Almost there — connect your Supabase project.</p>
+    <div class="setup-steps">
+      Open <code>index.html</code> and replace <code>SUPABASE_URL</code> and <code>SUPABASE_KEY</code> near the top of the script with the values from your Supabase project. The README has the full walkthrough.
     </div>
   </div>
+</section>
 
-  <div id="gridArea"></div>
-  <footer class="stat" id="statLine"></footer>
-</main>
+<!-- Sign in / create account -->
+<section id="authView" class="center-view hidden">
+  <div class="auth-card">
+    <div class="wordmark"><span class="bars"><i></i><i></i><i></i></span>lettersoxd</div>
+    <p class="tagline">Log every pair in your sock drawer.</p>
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-mode="signin" role="tab">Sign in</button>
+      <button class="tab" data-mode="signup" role="tab">Create account</button>
+    </div>
+    <form id="authForm" novalidate>
+      <div class="field">
+        <label for="authEmail">Email</label>
+        <input type="email" id="authEmail" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label for="authPassword">Password</label>
+        <input type="password" id="authPassword" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn primary block" id="authSubmit">Sign in</button>
+    </form>
+    <div class="msg" id="authMsg" role="status"></div>
+    <button class="linkish" id="forgotBtn" type="button">Forgot your password?</button>
+  </div>
+</section>
+
+<!-- Set a new password (after clicking the reset link in email) -->
+<section id="recoveryView" class="center-view hidden">
+  <div class="auth-card">
+    <h2>Choose a new password</h2>
+    <form id="recoveryForm" novalidate>
+      <div class="field">
+        <label for="recoveryPw">New password</label>
+        <input type="password" id="recoveryPw" autocomplete="new-password" required>
+      </div>
+      <button type="submit" class="btn primary block">Save password</button>
+    </form>
+    <div class="msg" id="recoveryMsg" role="status"></div>
+  </div>
+</section>
+
+<!-- Main app -->
+<div id="appView" class="hidden">
+  <nav class="top">
+    <div class="wordmark"><span class="bars"><i></i><i></i><i></i></span>lettersoxd</div>
+    <button class="btn-log" id="openAddBtn">+ Log a pair</button>
+    <button class="btn-account" id="openAccountBtn" aria-label="Account">Account</button>
+  </nav>
+
+  <main class="wrap">
+    <div class="section-head">
+      <h1>Socks<span class="count" id="countLine"></span></h1>
+      <div class="filters">
+        <input type="text" id="searchInput" placeholder="Search name" aria-label="Search by name">
+        <select id="brandFilter" aria-label="Filter by brand"><option value="">All brands</option></select>
+        <select id="sortSelect" aria-label="Sort">
+          <option value="recent">Recently added</option>
+          <option value="rating">Highest rated</option>
+          <option value="name">Name A–Z</option>
+        </select>
+      </div>
+    </div>
+    <div id="gridArea"></div>
+  </main>
+</div>
 
 <!-- Add modal -->
 <div class="overlay" id="addOverlay">
   <div class="modal">
     <h2>Log a pair</h2>
-
     <div class="field">
       <label>Photo</label>
       <div class="drop" id="photoTrigger">
         <div class="thumb" id="thumbSlot">🧦</div>
-        <div class="txt" id="photoHint"><b>Take or choose a photo</b>It's shrunk automatically before saving.</div>
+        <div class="txt" id="photoHint"><b>Take or choose a photo</b>It's shrunk automatically before uploading.</div>
       </div>
       <input type="file" accept="image/*" id="photoInput" class="hidden">
       <div style="margin-top:8px;">
-        <button type="button" class="link-danger" id="cameraBtn" style="color:var(--blue)">Use camera</button>
+        <button type="button" class="linkish" id="cameraBtn">Use camera</button>
         <input type="file" accept="image/*" capture="environment" id="cameraInput" class="hidden">
       </div>
     </div>
-
     <div class="field">
       <label for="nameInput">Name</label>
-      <input type="text" id="nameInput" placeholder="e.g. Space Jam Argyle">
+      <input type="text" id="nameInput" placeholder="e.g. Space Jam Argyle" maxlength="120">
     </div>
     <div class="field">
       <label for="brandInput">Brand / tag</label>
-      <input type="text" id="brandInput" list="brandSuggestions" placeholder="e.g. Disney, Coke">
+      <input type="text" id="brandInput" list="brandSuggestions" placeholder="e.g. Disney, Coke" maxlength="60">
       <datalist id="brandSuggestions"></datalist>
     </div>
     <div class="field">
@@ -403,9 +347,8 @@
     </div>
     <div class="field">
       <label for="notesInput">Notes</label>
-      <textarea id="notesInput" rows="2" placeholder="Where you got them, how they wear…"></textarea>
+      <textarea id="notesInput" rows="2" placeholder="Where you got them, how they wear…" maxlength="1000"></textarea>
     </div>
-
     <div class="actions">
       <button class="btn ghost" id="cancelAddBtn">Cancel</button>
       <button class="btn primary" id="saveBtn" disabled>Save</button>
@@ -414,8 +357,34 @@
 </div>
 
 <!-- Detail modal -->
-<div class="overlay" id="detailOverlay">
-  <div class="modal wide" id="detailBody"></div>
+<div class="overlay" id="detailOverlay"><div class="modal wide" id="detailBody"></div></div>
+
+<!-- Account modal -->
+<div class="overlay" id="accountOverlay">
+  <div class="modal">
+    <h2>Account</h2>
+    <p id="accountEmail" style="margin-top:-6px;"></p>
+
+    <div class="field">
+      <label for="newPw">Change password</label>
+      <input type="password" id="newPw" autocomplete="new-password" placeholder="New password (8+ characters)">
+    </div>
+    <button class="btn ghost block" id="changePwBtn">Update password</button>
+    <div class="msg" id="accountMsg" role="status"></div>
+
+    <div class="actions">
+      <button class="btn ghost" id="closeAccountBtn">Close</button>
+      <button class="btn ghost" id="signOutBtn">Sign out</button>
+    </div>
+
+    <div class="danger-zone">
+      <p>Deleting your account permanently removes your socks and photos. This can't be undone.</p>
+      <div class="field">
+        <input type="text" id="deleteConfirm" placeholder="Type DELETE to confirm" autocomplete="off" aria-label="Type DELETE to confirm">
+      </div>
+      <button class="btn danger block" id="deleteAccountBtn" disabled>Delete my account</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -424,67 +393,157 @@
 (function () {
   "use strict";
 
-  // ---------- IndexedDB ----------
-  const DB_NAME = "sockDrawerDB"; // same DB as before so existing pairs carry over
-  const STORE = "socks";
-  let dbPromise = null;
+  // ============================================================
+  //  CONFIG — paste your own values from the Supabase dashboard.
+  //  The publishable key is designed to be public; your data is
+  //  protected by the row-level security rules in schema.sql.
+  //  NEVER paste a secret key or service_role key here.
+  // ============================================================
+  const SUPABASE_URL = "YOUR_SUPABASE_URL";
+  const SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
 
-  function openDB() {
-    if (dbPromise) return dbPromise;
-    dbPromise = new Promise((resolve, reject) => {
-      try {
-        const req = indexedDB.open(DB_NAME, 1);
-        req.onupgradeneeded = () => {
-          const db = req.result;
-          if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: "id" });
-        };
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-      } catch (e) { reject(e); }
-    });
-    return dbPromise;
+  const BUCKET = "sock-photos";
+  const SIGNED_URL_TTL = 60 * 60 * 4; // photo links stay valid for 4 hours
+  const FULL_MAX = 800;               // longest side of the detail photo
+  const THUMB_W = 300, THUMB_H = 450; // 2:3 poster thumbnail
+  const MIN_PW = 8;
+
+  const $ = (id) => document.getElementById(id);
+  const VIEWS = ["loadingView", "setupView", "authView", "recoveryView", "appView"];
+  function showView(name) { VIEWS.forEach(v => $(v).classList.toggle("hidden", v !== name)); }
+
+  if (SUPABASE_URL.indexOf("YOUR_") === 0 || SUPABASE_KEY.indexOf("YOUR_") === 0) { showView("setupView"); return; }
+  if (!window.supabase) {
+    $("loadingView").innerHTML = '<div class="auth-card"><h2>Couldn\'t load</h2>The Supabase library didn\'t load. Check your connection and refresh.</div>';
+    return;
   }
-  async function dbGetAll() {
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ---------- Helpers ----------
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+  function toast(msg) {
+    const t = $("toast");
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 2200);
+  }
+  function setMsg(id, text, kind) {
+    const el = $(id);
+    el.textContent = text || "";
+    el.className = "msg" + (kind ? " " + kind : "");
+  }
+  function fmtDate(ts) {
+    try { return new Date(ts).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }); }
+    catch (e) { return ""; }
+  }
+  function fmtBytes(n) {
+    if (n < 1024) return n + " B";
+    if (n < 1024 * 1024) return Math.round(n / 1024) + " KB";
+    return (n / 1024 / 1024).toFixed(1) + " MB";
+  }
+  const redirectUrl = () => location.origin + location.pathname;
+
+  // ============================================================
+  //  AUTH
+  // ============================================================
+  let authMode = "signin";
+  let currentUserId = null;
+  let currentUser = null;
+  let recoveryMode = location.hash.indexOf("type=recovery") !== -1;
+
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => setAuthMode(tab.getAttribute("data-mode")));
+  });
+  function setAuthMode(mode) {
+    authMode = mode;
+    document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.getAttribute("data-mode") === mode));
+    $("authSubmit").textContent = mode === "signin" ? "Sign in" : "Create account";
+    $("authPassword").setAttribute("autocomplete", mode === "signin" ? "current-password" : "new-password");
+    $("forgotBtn").classList.toggle("hidden", mode !== "signin");
+    setMsg("authMsg", "");
+  }
+
+  $("authForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = $("authEmail").value.trim();
+    const password = $("authPassword").value;
+    if (!email) return setMsg("authMsg", "Enter your email address.", "err");
+    if (authMode === "signup" && password.length < MIN_PW) return setMsg("authMsg", `Use at least ${MIN_PW} characters for your password.`, "err");
+    if (!password) return setMsg("authMsg", "Enter your password.", "err");
+
+    $("authSubmit").disabled = true;
+    setMsg("authMsg", authMode === "signin" ? "Signing in…" : "Creating your account…");
     try {
-      const db = await openDB();
-      return await new Promise((resolve, reject) => {
-        const req = db.transaction(STORE, "readonly").objectStore(STORE).getAll();
-        req.onsuccess = () => resolve(req.result || []);
-        req.onerror = () => reject(req.error);
-      });
-    } catch (e) { console.error(e); return []; }
-  }
-  async function dbPut(rec) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, "readwrite");
-      tx.objectStore(STORE).put(rec);
-      tx.oncomplete = () => resolve(true);
-      tx.onerror = () => reject(tx.error);
-    });
-  }
-  async function dbDelete(id) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, "readwrite");
-      tx.objectStore(STORE).delete(id);
-      tx.oncomplete = () => resolve(true);
-      tx.onerror = () => reject(tx.error);
-    });
+      if (authMode === "signin") {
+        const { error } = await sb.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        setMsg("authMsg", "");
+      } else {
+        const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: redirectUrl() } });
+        if (error) throw error;
+        if (!data.session) {
+          setMsg("authMsg", "Check your email for a confirmation link, then sign in.", "ok");
+        }
+      }
+    } catch (err) {
+      setMsg("authMsg", err.message || "Something went wrong. Try again.", "err");
+    } finally {
+      $("authSubmit").disabled = false;
+    }
+  });
+
+  $("forgotBtn").addEventListener("click", async () => {
+    const email = $("authEmail").value.trim();
+    if (!email) return setMsg("authMsg", "Enter your email above, then tap “Forgot your password?” again.", "err");
+    setMsg("authMsg", "Sending…");
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: redirectUrl() });
+    if (error) setMsg("authMsg", error.message, "err");
+    else setMsg("authMsg", "If that address has an account, a reset link is on its way.", "ok");
+  });
+
+  $("recoveryForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const pw = $("recoveryPw").value;
+    if (pw.length < MIN_PW) return setMsg("recoveryMsg", `Use at least ${MIN_PW} characters.`, "err");
+    const { error } = await sb.auth.updateUser({ password: pw });
+    if (error) return setMsg("recoveryMsg", error.message, "err");
+    recoveryMode = false;
+    $("recoveryPw").value = "";
+    history.replaceState(null, "", location.pathname);
+    toast("Password updated");
+    const { data } = await sb.auth.getSession();
+    if (data.session) { currentUserId = data.session.user.id; currentUser = data.session.user; enterApp(); }
+    else showView("authView");
+  });
+
+  // supabase-js advises against awaiting other Supabase calls inside this callback,
+  // so the real work is deferred with setTimeout.
+  sb.auth.onAuthStateChange((event, session) => {
+    setTimeout(() => handleAuth(event, session), 0);
+  });
+
+  function handleAuth(event, session) {
+    if (event === "PASSWORD_RECOVERY") recoveryMode = true;
+    if (recoveryMode && session) { showView("recoveryView"); return; }
+    if (session) {
+      currentUser = session.user;
+      $("accountEmail").textContent = session.user.email || "";
+      if (currentUserId !== session.user.id) {
+        currentUserId = session.user.id;
+        enterApp();
+      }
+      return;
+    }
+    // signed out
+    currentUserId = null; currentUser = null; allSocks = []; urlMap = {};
+    closeAllModals();
+    showView("authView");
   }
 
-  // ---------- Image compression ----------
-  const FULL_MAX = 800;      // longest side of detail image
-  const THUMB_W = 300;       // poster thumbnail, 2:3
-  const THUMB_H = 450;
-  const supportsWebp = (() => {
-    try { return document.createElement("canvas").toDataURL("image/webp").startsWith("data:image/webp"); }
-    catch (e) { return false; }
-  })();
-
-  function encode(canvas, q) {
-    return supportsWebp ? canvas.toDataURL("image/webp", q) : canvas.toDataURL("image/jpeg", q);
-  }
+  // ============================================================
+  //  IMAGE COMPRESSION (runs in the browser before upload)
+  // ============================================================
   function loadImage(src) {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -493,56 +552,81 @@
       img.src = src;
     });
   }
-  function makeFull(img) {
-    let w = img.naturalWidth, h = img.naturalHeight;
-    const scale = Math.min(1, FULL_MAX / Math.max(w, h));
-    w = Math.round(w * scale); h = Math.round(h * scale);
+  // Prefer WebP; some older Safari versions silently return PNG, so verify and fall back to JPEG.
+  async function encodeCanvas(canvas, quality) {
+    const toBlob = (type) => new Promise(res => canvas.toBlob(res, type, quality));
+    let blob = await toBlob("image/webp");
+    if (!blob || blob.type !== "image/webp") blob = await toBlob("image/jpeg");
+    return blob;
+  }
+  async function makeFull(img) {
+    const scale = Math.min(1, FULL_MAX / Math.max(img.naturalWidth, img.naturalHeight));
+    const w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale);
     const c = document.createElement("canvas");
     c.width = w; c.height = h;
     c.getContext("2d").drawImage(img, 0, 0, w, h);
-    return encode(c, 0.72);
+    return encodeCanvas(c, 0.72);
   }
-  function makeThumb(img) {
-    // Center-crop to a 2:3 poster
+  async function makeThumb(img) {
     const c = document.createElement("canvas");
     c.width = THUMB_W; c.height = THUMB_H;
-    const targetRatio = THUMB_W / THUMB_H;
-    const srcRatio = img.naturalWidth / img.naturalHeight;
+    const target = THUMB_W / THUMB_H, src = img.naturalWidth / img.naturalHeight;
     let sx = 0, sy = 0, sw = img.naturalWidth, sh = img.naturalHeight;
-    if (srcRatio > targetRatio) { sw = sh * targetRatio; sx = (img.naturalWidth - sw) / 2; }
-    else { sh = sw / targetRatio; sy = (img.naturalHeight - sh) / 2; }
+    if (src > target) { sw = sh * target; sx = (img.naturalWidth - sw) / 2; }
+    else { sh = sw / target; sy = (img.naturalHeight - sh) / 2; }
     c.getContext("2d").drawImage(img, sx, sy, sw, sh, 0, 0, THUMB_W, THUMB_H);
-    return encode(c, 0.7);
+    return encodeCanvas(c, 0.7);
   }
-  function approxBytes(dataUrl) { return dataUrl ? Math.round(dataUrl.length * 0.75) : 0; }
-  function fmtBytes(n) {
-    if (n < 1024) return n + " B";
-    if (n < 1024 * 1024) return Math.round(n / 1024) + " KB";
-    return (n / 1024 / 1024).toFixed(1) + " MB";
-  }
+  const extFor = (blob) => blob.type === "image/webp" ? "webp" : "jpg";
 
-  // ---------- State & helpers ----------
+  // ============================================================
+  //  DATA
+  // ============================================================
   let allSocks = [];
-  let pending = { photo: null, thumb: null, rating: 0 };
+  let urlMap = {};   // storage path -> signed URL
 
-  const $ = (id) => document.getElementById(id);
-  const gridArea = $("gridArea"), countLine = $("countLine"), statLine = $("statLine");
+  async function loadSocks() {
+    $("gridArea").innerHTML = '<div class="empty">Loading your collection…</div>';
+    const { data, error } = await sb.from("socks").select("*").order("created_at", { ascending: false });
+    if (error) {
+      console.error(error);
+      $("gridArea").innerHTML = '<div class="empty"><h2>Couldn\'t load your socks</h2>Check your connection and refresh.</div>';
+      return;
+    }
+    allSocks = data || [];
+    await signThumbs();
+    refreshBrands();
+    render();
+  }
+
+  async function signThumbs() {
+    urlMap = {};
+    const paths = allSocks.map(s => s.thumb_path).filter(Boolean);
+    if (!paths.length) return;
+    const { data, error } = await sb.storage.from(BUCKET).createSignedUrls(paths, SIGNED_URL_TTL);
+    if (error) { console.error(error); return; }
+    (data || []).forEach(d => { if (d.signedUrl) urlMap[d.path] = d.signedUrl; });
+  }
+
+  // ============================================================
+  //  UI: grid
+  // ============================================================
   const searchInput = $("searchInput"), brandFilter = $("brandFilter"), sortSelect = $("sortSelect");
 
-  function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  }
-  function toast(msg) {
-    const t = $("toast");
-    t.textContent = msg; t.classList.add("show");
-    clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 1800);
-  }
-  function fmtDate(ts) {
-    try { return new Date(ts).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }); }
-    catch (e) { return ""; }
+  function enterApp() {
+    showView("appView");
+    searchInput.value = ""; brandFilter.value = ""; sortSelect.value = "recent";
+    loadSocks();
   }
 
-  // ---------- Stars (half-star capable, rating stored as 0-10) ----------
+  function refreshBrands() {
+    const brands = Array.from(new Set(allSocks.map(s => s.brand).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+    const cur = brandFilter.value;
+    brandFilter.innerHTML = '<option value="">All brands</option>' + brands.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join("");
+    if (brands.indexOf(cur) !== -1) brandFilter.value = cur;
+    $("brandSuggestions").innerHTML = brands.map(b => `<option value="${esc(b)}">`).join("");
+  }
+
   function starsHtml(value, large) {
     const pct = Math.max(0, Math.min(10, value || 0)) * 10;
     return `<span class="stars${large ? " lg" : ""}" aria-label="${(value || 0) / 2} out of 5 stars">★★★★★<span class="fill" style="width:${pct}%">★★★★★</span></span>`;
@@ -553,107 +637,69 @@
     const el = slot.querySelector(".stars");
     el.addEventListener("click", (e) => {
       const rect = el.getBoundingClientRect();
-      const frac = (e.clientX - rect.left) / rect.width;
-      let v = Math.max(1, Math.min(10, Math.ceil(frac * 10)));
-      if (v === value) v = 0;   // tap the same rating again to clear
+      let v = Math.max(1, Math.min(10, Math.ceil(((e.clientX - rect.left) / rect.width) * 10)));
+      if (v === value) v = 0;  // tap the same rating again to clear
       value = v;
       el.querySelector(".fill").style.width = (value * 10) + "%";
       onChange(value);
     });
   }
 
-  // ---------- Load / render ----------
-  async function loadAll() {
-    allSocks = await dbGetAll();
-    refreshBrands();
-    render();
-    migrateOldPhotos();
-  }
-
-  // Older entries saved before thumbnails existed get one generated once
-  async function migrateOldPhotos() {
-    let changed = false;
-    for (const s of allSocks) {
-      if (s.photo && !s.thumb) {
-        try {
-          const img = await loadImage(s.photo);
-          s.thumb = makeThumb(img);
-          s.photo = makeFull(img);
-          await dbPut(s);
-          changed = true;
-        } catch (e) { console.error("migrate failed", e); }
-      }
-    }
-    if (changed) render();
-  }
-
-  function refreshBrands() {
-    const brands = Array.from(new Set(allSocks.map(s => s.brand).filter(Boolean))).sort((a, b) => a.localeCompare(b));
-    const cur = brandFilter.value;
-    brandFilter.innerHTML = '<option value="">All brands</option>' + brands.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join("");
-    if (brands.includes(cur)) brandFilter.value = cur;
-    $("brandSuggestions").innerHTML = brands.map(b => `<option value="${esc(b)}">`).join("");
-  }
-
   function render() {
     const q = searchInput.value.trim().toLowerCase();
     const brand = brandFilter.value;
-    let list = allSocks.filter(s => (!q || s.name.toLowerCase().includes(q)) && (!brand || s.brand === brand));
+    const list = allSocks.filter(s => (!q || s.name.toLowerCase().includes(q)) && (!brand || s.brand === brand));
 
     const sort = sortSelect.value;
-    if (sort === "rating") list.sort((a, b) => (b.rating || 0) - (a.rating || 0) || b.createdAt - a.createdAt);
+    if (sort === "rating") list.sort((a, b) => (b.rating || 0) - (a.rating || 0) || new Date(b.created_at) - new Date(a.created_at));
     else if (sort === "name") list.sort((a, b) => a.name.localeCompare(b.name));
-    else list.sort((a, b) => b.createdAt - a.createdAt);   // default: recently added
+    else list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));  // default: recently added
 
-    countLine.textContent = allSocks.length ? `${allSocks.length} pair${allSocks.length === 1 ? "" : "s"}` : "";
-
-    const bytes = allSocks.reduce((n, s) => n + approxBytes(s.photo) + approxBytes(s.thumb), 0);
-    statLine.textContent = allSocks.length ? `Photos take up about ${fmtBytes(bytes)} in total` : "";
+    $("countLine").textContent = allSocks.length ? `${allSocks.length} pair${allSocks.length === 1 ? "" : "s"}` : "";
 
     if (!allSocks.length) {
-      gridArea.innerHTML = `<div class="empty"><h2>Nothing logged yet</h2>Log your first pair to start the collection.</div>`;
+      $("gridArea").innerHTML = '<div class="empty"><h2>Nothing logged yet</h2>Log your first pair to start the collection.</div>';
       return;
     }
     if (!list.length) {
-      gridArea.innerHTML = `<div class="empty"><h2>No matches</h2>Try a different search or brand.</div>`;
+      $("gridArea").innerHTML = '<div class="empty"><h2>No matches</h2>Try a different search or brand.</div>';
       return;
     }
-
-    gridArea.innerHTML = `<div class="grid">` + list.map(s => {
-      const src = s.thumb || s.photo;
+    $("gridArea").innerHTML = '<div class="grid">' + list.map(s => {
+      const src = s.thumb_path && urlMap[s.thumb_path];
       return `<div class="film">
         <button class="poster" data-id="${esc(s.id)}" aria-label="Open ${esc(s.name)}">
-          ${src ? `<img src="${src}" alt="${esc(s.name)}" loading="lazy">` : `<div class="no-photo">🧦</div>`}
+          ${src ? `<img src="${esc(src)}" alt="${esc(s.name)}" loading="lazy">` : '<div class="no-photo">🧦</div>'}
           <span class="cap">${esc(s.name)}${s.brand ? `<small>${esc(s.brand)}</small>` : ""}</span>
         </button>
         ${s.rating ? starsHtml(s.rating, false) : ""}
       </div>`;
-    }).join("") + `</div>`;
-
-    gridArea.querySelectorAll(".poster").forEach(b => b.addEventListener("click", () => openDetail(b.getAttribute("data-id"))));
+    }).join("") + "</div>";
+    $("gridArea").querySelectorAll(".poster").forEach(b => b.addEventListener("click", () => openDetail(b.getAttribute("data-id"))));
   }
-
   searchInput.addEventListener("input", render);
   brandFilter.addEventListener("change", render);
   sortSelect.addEventListener("change", render);
 
-  // ---------- Detail ----------
+  // ============================================================
+  //  UI: detail + delete
+  // ============================================================
   const detailOverlay = $("detailOverlay"), detailBody = $("detailBody");
 
-  function openDetail(id) {
+  async function openDetail(id) {
     const s = allSocks.find(x => x.id === id);
     if (!s) return;
-    const src = s.photo || s.thumb;
+    const thumbSrc = s.thumb_path && urlMap[s.thumb_path];
     detailBody.innerHTML = `
       <div class="detail">
-        <div class="big-poster">${src ? `<img src="${src}" alt="${esc(s.name)}">` : ""}</div>
+        <div class="big-poster">${thumbSrc ? `<img id="detailImg" src="${esc(thumbSrc)}" alt="${esc(s.name)}">` : ""}</div>
         <div>
           <h2>${esc(s.name)}</h2>
           ${s.brand ? `<span class="brand-tag">${esc(s.brand)}</span>` : ""}
           <div class="rate-label">Your rating</div>
           <div id="detailRating"></div>
           ${s.notes ? `<p class="notes">${esc(s.notes)}</p>` : ""}
-          <div class="added">Logged ${fmtDate(s.createdAt)}</div>
+          <div class="added">Logged ${fmtDate(s.created_at)}</div>
           <div class="del-zone" id="delZone">
             <button class="btn ghost" id="closeDetail" style="flex:0 1 auto">Close</button>
             <button class="link-danger" id="askDelete">Delete this pair</button>
@@ -668,46 +714,61 @@
     detailOverlay.classList.add("open");
 
     mountRatingInput($("detailRating"), s.rating || 0, async (v) => {
-      s.rating = v;
-      try { await dbPut(s); render(); } catch (e) { console.error(e); toast("Couldn't save rating"); }
+      const { error } = await sb.from("socks").update({ rating: v }).eq("id", s.id);
+      if (error) { console.error(error); toast("Couldn't save rating"); return; }
+      s.rating = v; render();
     });
     $("closeDetail").onclick = closeDetail;
     $("askDelete").onclick = () => { $("delZone").classList.add("hidden"); $("confirmZone").classList.remove("hidden"); };
     $("cancelDelete").onclick = () => { $("confirmZone").classList.add("hidden"); $("delZone").classList.remove("hidden"); };
-    $("confirmDelete").onclick = async () => {
-      try {
-        await dbDelete(id);
-        toast("Pair deleted");
-        closeDetail();
-        await loadAll();
-      } catch (e) { console.error(e); toast("Couldn't delete — try again"); }
-    };
+    $("confirmDelete").onclick = () => deleteSock(s);
+
+    // Swap in the larger photo once its signed link is ready
+    if (s.photo_path) {
+      const { data, error } = await sb.storage.from(BUCKET).createSignedUrl(s.photo_path, 3600);
+      const img = $("detailImg");
+      if (!error && data && data.signedUrl && img) img.src = data.signedUrl;
+    }
   }
   function closeDetail() { detailOverlay.classList.remove("open"); detailBody.innerHTML = ""; }
   detailOverlay.addEventListener("click", e => { if (e.target === detailOverlay) closeDetail(); });
 
-  // ---------- Add ----------
+  async function deleteSock(s) {
+    const { error } = await sb.from("socks").delete().eq("id", s.id);
+    if (error) { console.error(error); toast("Couldn't delete — try again"); return; }
+    const paths = [s.photo_path, s.thumb_path].filter(Boolean);
+    if (paths.length) {
+      const r = await sb.storage.from(BUCKET).remove(paths);
+      if (r.error) console.error(r.error);
+    }
+    toast("Pair deleted");
+    closeDetail();
+    await loadSocks();
+  }
+
+  // ============================================================
+  //  UI: add a pair
+  // ============================================================
   const addOverlay = $("addOverlay"), nameInput = $("nameInput"), brandInput = $("brandInput"),
-        notesInput = $("notesInput"), saveBtn = $("saveBtn"), photoInput = $("photoInput"), cameraInput = $("cameraInput");
+        notesInput = $("notesInput"), saveBtn = $("saveBtn");
+  let pending = { photo: null, thumb: null, rating: 0, previewUrl: null };
 
   function resetAdd() {
-    pending = { photo: null, thumb: null, rating: 0 };
+    if (pending.previewUrl) URL.revokeObjectURL(pending.previewUrl);
+    pending = { photo: null, thumb: null, rating: 0, previewUrl: null };
     nameInput.value = ""; brandInput.value = ""; notesInput.value = "";
-    $("thumbSlot").innerHTML = "🧦";
-    $("photoHint").innerHTML = "<b>Take or choose a photo</b>It's shrunk automatically before saving.";
+    $("thumbSlot").textContent = "🧦";
+    $("photoHint").innerHTML = "<b>Take or choose a photo</b>It's shrunk automatically before uploading.";
     mountRatingInput($("addRatingSlot"), 0, v => { pending.rating = v; });
     saveBtn.disabled = true;
   }
-
   $("openAddBtn").addEventListener("click", () => {
-    resetAdd();
-    addOverlay.classList.add("open");
-    setTimeout(() => nameInput.focus(), 50);
+    resetAdd(); addOverlay.classList.add("open"); setTimeout(() => nameInput.focus(), 50);
   });
   $("cancelAddBtn").addEventListener("click", () => addOverlay.classList.remove("open"));
   addOverlay.addEventListener("click", e => { if (e.target === addOverlay) addOverlay.classList.remove("open"); });
-  $("photoTrigger").addEventListener("click", () => photoInput.click());
-  $("cameraBtn").addEventListener("click", () => cameraInput.click());
+  $("photoTrigger").addEventListener("click", () => $("photoInput").click());
+  $("cameraBtn").addEventListener("click", () => $("cameraInput").click());
   nameInput.addEventListener("input", () => { saveBtn.disabled = !nameInput.value.trim(); });
 
   async function handleFile(file) {
@@ -715,52 +776,123 @@
     const url = URL.createObjectURL(file);
     try {
       const img = await loadImage(url);
-      pending.photo = makeFull(img);
-      pending.thumb = makeThumb(img);
-      const after = approxBytes(pending.photo) + approxBytes(pending.thumb);
-      $("thumbSlot").innerHTML = `<img src="${pending.thumb}" alt="Preview">`;
-      $("photoHint").innerHTML = `<b>Photo ready</b>${fmtBytes(file.size)} → ${fmtBytes(after)} after compression`;
+      const [full, thumb] = await Promise.all([makeFull(img), makeThumb(img)]);
+      if (pending.previewUrl) URL.revokeObjectURL(pending.previewUrl);
+      pending.photo = full; pending.thumb = thumb;
+      pending.previewUrl = URL.createObjectURL(thumb);
+      $("thumbSlot").innerHTML = `<img src="${pending.previewUrl}" alt="Preview">`;
+      $("photoHint").innerHTML = `<b>Photo ready</b>${fmtBytes(file.size)} → ${fmtBytes(full.size + thumb.size)} after compression`;
     } catch (e) {
-      console.error(e);
-      toast("Couldn't read that photo");
+      console.error(e); toast("Couldn't read that photo");
     } finally {
       URL.revokeObjectURL(url);
     }
   }
-  photoInput.addEventListener("change", () => handleFile(photoInput.files[0]));
-  cameraInput.addEventListener("change", () => handleFile(cameraInput.files[0]));
+  $("photoInput").addEventListener("change", (e) => handleFile(e.target.files[0]));
+  $("cameraInput").addEventListener("change", (e) => handleFile(e.target.files[0]));
 
   saveBtn.addEventListener("click", async () => {
     const name = nameInput.value.trim();
-    if (!name) return;
-    const rec = {
-      id: "s_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8),
-      name,
-      brand: brandInput.value.trim(),
-      notes: notesInput.value.trim(),
-      rating: pending.rating || 0,
-      photo: pending.photo,
-      thumb: pending.thumb,
-      createdAt: Date.now()
-    };
+    if (!name || !currentUserId) return;
     saveBtn.disabled = true;
+    const id = crypto.randomUUID();
+    const uploaded = [];
+    let photo_path = null, thumb_path = null;
     try {
-      await dbPut(rec);
+      if (pending.photo && pending.thumb) {
+        photo_path = `${currentUserId}/${id}.${extFor(pending.photo)}`;
+        thumb_path = `${currentUserId}/${id}_thumb.${extFor(pending.thumb)}`;
+        let r = await sb.storage.from(BUCKET).upload(photo_path, pending.photo, { contentType: pending.photo.type, upsert: false });
+        if (r.error) throw r.error;
+        uploaded.push(photo_path);
+        r = await sb.storage.from(BUCKET).upload(thumb_path, pending.thumb, { contentType: pending.thumb.type, upsert: false });
+        if (r.error) throw r.error;
+        uploaded.push(thumb_path);
+      }
+      const { error } = await sb.from("socks").insert({
+        id, name,
+        brand: brandInput.value.trim() || null,
+        notes: notesInput.value.trim() || null,
+        rating: pending.rating || 0,
+        photo_path, thumb_path
+      });
+      if (error) throw error;
       addOverlay.classList.remove("open");
       toast("Pair logged");
-      await loadAll();
+      await loadSocks();
     } catch (e) {
       console.error(e);
+      if (uploaded.length) await sb.storage.from(BUCKET).remove(uploaded);  // don't leave orphaned files
       toast("Couldn't save — try again");
       saveBtn.disabled = false;
     }
   });
 
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape") { addOverlay.classList.remove("open"); closeDetail(); }
+  // ============================================================
+  //  UI: account
+  // ============================================================
+  const accountOverlay = $("accountOverlay");
+  $("openAccountBtn").addEventListener("click", () => {
+    $("newPw").value = ""; $("deleteConfirm").value = ""; $("deleteAccountBtn").disabled = true;
+    setMsg("accountMsg", "");
+    accountOverlay.classList.add("open");
+  });
+  $("closeAccountBtn").addEventListener("click", () => accountOverlay.classList.remove("open"));
+  accountOverlay.addEventListener("click", e => { if (e.target === accountOverlay) accountOverlay.classList.remove("open"); });
+
+  $("changePwBtn").addEventListener("click", async () => {
+    const pw = $("newPw").value;
+    if (pw.length < MIN_PW) return setMsg("accountMsg", `Use at least ${MIN_PW} characters.`, "err");
+    const { error } = await sb.auth.updateUser({ password: pw });
+    if (error) return setMsg("accountMsg", error.message, "err");
+    $("newPw").value = "";
+    setMsg("accountMsg", "Password updated.", "ok");
   });
 
-  loadAll();
+  $("signOutBtn").addEventListener("click", async () => {
+    await sb.auth.signOut();
+  });
+
+  $("deleteConfirm").addEventListener("input", () => {
+    $("deleteAccountBtn").disabled = $("deleteConfirm").value.trim() !== "DELETE";
+  });
+
+  $("deleteAccountBtn").addEventListener("click", async () => {
+    if ($("deleteConfirm").value.trim() !== "DELETE" || !currentUserId) return;
+    $("deleteAccountBtn").disabled = true;
+    setMsg("accountMsg", "Deleting your account…");
+    try {
+      // 1. Remove every photo in this user's storage folder
+      for (let guard = 0; guard < 50; guard++) {
+        const { data: files, error: listErr } = await sb.storage.from(BUCKET).list(currentUserId, { limit: 100 });
+        if (listErr) throw listErr;
+        if (!files || !files.length) break;
+        const { error: rmErr } = await sb.storage.from(BUCKET).remove(files.map(f => `${currentUserId}/${f.name}`));
+        if (rmErr) throw rmErr;
+      }
+      // 2. Delete the auth user (socks rows are removed by cascade) via the database function in schema.sql
+      const { error } = await sb.rpc("delete_my_account");
+      if (error) throw error;
+      await sb.auth.signOut({ scope: "local" });
+      toast("Your account has been deleted");
+    } catch (e) {
+      console.error(e);
+      setMsg("accountMsg", "Couldn't delete your account. Try again, or contact the site owner.", "err");
+      $("deleteAccountBtn").disabled = false;
+    }
+  });
+
+  // ---------- Misc ----------
+  function closeAllModals() {
+    addOverlay.classList.remove("open");
+    accountOverlay.classList.remove("open");
+    closeDetail();
+  }
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeAllModals(); });
+
+  // Nothing is shown until Supabase reports the session state (fires almost instantly).
+  showView("loadingView");
+  setAuthMode("signin");
 })();
 </script>
 </body>
