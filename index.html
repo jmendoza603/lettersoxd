@@ -150,10 +150,12 @@ nav.top .wordmark {
   .poster:hover .cap, .poster:focus-visible .cap { opacity: 1; }
   @media (hover: none) { .poster .cap { opacity: 1; } }
 
-  .stars { position: relative; display: inline-block; font-size: 13px; letter-spacing: 1px; line-height: 1; color: var(--bg-input); user-select: none; }
+  .stars { position: relative; display: inline-block; width: max-content; align-self: flex-start; font-size: 13px; letter-spacing: 1px; line-height: 1; color: var(--text-faint); user-select: none; }
   .stars .fill { position: absolute; left: 0; top: 0; bottom: 0; overflow: hidden; white-space: nowrap; color: var(--star); }
   .stars.lg { font-size: 26px; letter-spacing: 3px; cursor: pointer; }
 
+  .film .stars { color: transparent; }
+  
   .empty { text-align: center; padding: 70px 10px; color: var(--text-faint); }
   .empty h2 { color: var(--text); font-size: 17px; margin: 0 0 6px; }
 
